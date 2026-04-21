@@ -24,8 +24,19 @@ const checklist = [
   { icon: "Star", label: "Хорошее настроение" },
 ];
 
+const TOTAL_SPOTS = 30;
+const REGISTERED = 12;
+
+const foodOptions = [
+  { value: "none", label: "Нет" },
+  { value: "veg", label: "Вегетарианское" },
+  { value: "halal", label: "Халяль" },
+  { value: "gluten", label: "Без глютена" },
+  { value: "other", label: "Другое" },
+];
+
 export default function Index() {
-  const [form, setForm] = useState({ name: "", dept: "", startDate: "" });
+  const [form, setForm] = useState({ name: "", dept: "", startDate: "", food: "none" });
   const [submitted, setSubmitted] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
@@ -165,16 +176,34 @@ export default function Index() {
         <div className="bg-[--hero-bg] rounded-3xl p-8 md:p-10 text-white">
           <div className="mb-6">
             <h2 className="font-display text-3xl font-bold mb-1">Зарегистрируйся</h2>
-            <p className="text-white/60">Займёт меньше минуты — чтобы мы знали, кого ждать</p>
+            <p className="text-white/60 mb-4">Займёт меньше минуты — чтобы мы знали, кого ждать</p>
+            <div className="bg-white/10 border border-white/20 rounded-2xl px-5 py-4">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <Icon name="Users" size={15} className="text-blue-400" />
+                  <span>Уже зарегистрировалось</span>
+                </div>
+                <span className="text-sm font-bold text-blue-400">{REGISTERED} из {TOTAL_SPOTS} мест</span>
+              </div>
+              <div className="w-full bg-white/10 rounded-full h-2">
+                <div
+                  className="bg-blue-400 h-2 rounded-full transition-all duration-700"
+                  style={{ width: `${(REGISTERED / TOTAL_SPOTS) * 100}%` }}
+                />
+              </div>
+              <p className="text-xs text-white/40 mt-1.5">Осталось {TOTAL_SPOTS - REGISTERED} мест</p>
+            </div>
           </div>
 
           {submitted ? (
-            <div className="flex flex-col items-center justify-center py-10 gap-3">
+            <div className="flex flex-col items-center justify-center py-10 gap-3 text-center">
               <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mb-2">
                 <Icon name="Check" size={32} className="text-white" />
               </div>
-              <div className="text-xl font-semibold">Отлично, {form.name}!</div>
-              <div className="text-white/60 text-center">Ты зарегистрирован. Ждём тебя 15 мая в 10:00 в переговорной «Альфа».</div>
+              <div className="text-xl font-semibold">Отлично, {form.name}! 🎉</div>
+              <div className="text-white/70 max-w-sm">
+                Ждём тебя 15 мая. Письмо с подтверждением придёт на корпоративную почту.
+              </div>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -209,6 +238,25 @@ export default function Index() {
                   onChange={e => setForm(f => ({ ...f, startDate: e.target.value }))}
                   className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-400 transition-colors [color-scheme:dark]"
                 />
+              </div>
+              <div>
+                <label className="block text-sm text-white/60 mb-2">Особые пожелания к питанию</label>
+                <div className="flex flex-wrap gap-2">
+                  {foodOptions.map(opt => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => setForm(f => ({ ...f, food: opt.value }))}
+                      className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all duration-150 ${
+                        form.food === opt.value
+                          ? "bg-blue-500 border-blue-400 text-white"
+                          : "bg-white/10 border-white/20 text-white/70 hover:bg-white/20"
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
               </div>
               <button
                 type="submit"
@@ -248,20 +296,30 @@ export default function Index() {
 
       {/* CONTACT */}
       <section className="max-w-4xl mx-auto px-6 pb-20">
-        <div className="bg-[--card] border border-[--border] rounded-2xl p-6 flex flex-col md:flex-row items-start md:items-center gap-4 justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-[--accent-light] rounded-xl flex items-center justify-center">
-              <Icon name="HeadphonesIcon" size={18} className="text-[--accent]" fallback="Phone" />
+        <div className="bg-[--card] border border-[--border] rounded-2xl p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Icon name="MessageCircle" size={18} className="text-[--accent]" />
+            <h3 className="font-display font-bold text-lg">Контакт организатора</h3>
+          </div>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 bg-[--accent] rounded-full flex items-center justify-center text-white font-bold text-base">АП</div>
+              <div>
+                <div className="font-semibold">Анна Петрова</div>
+                <div className="text-sm text-[--muted]">HR-организатор</div>
+              </div>
             </div>
-            <div>
-              <div className="font-semibold">Остались вопросы?</div>
-              <div className="text-sm text-[--muted]">Пиши организаторам — ответим быстро</div>
+            <div className="flex flex-wrap gap-2">
+              <a href="mailto:hr@company.ru" className="flex items-center gap-2 bg-[--accent-light] text-[--accent] rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-blue-100 transition-colors border border-blue-100">
+                <Icon name="Mail" size={14} />
+                hr@company.ru
+              </a>
+              <a href="https://t.me/anna_hr" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-sky-50 text-sky-600 rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-sky-100 transition-colors border border-sky-100">
+                <Icon name="Send" size={14} />
+                @anna_hr
+              </a>
             </div>
           </div>
-          <a href="mailto:hr@company.ru" className="flex items-center gap-2 bg-[--accent] text-white rounded-xl px-5 py-2.5 text-sm font-semibold hover:bg-[--accent-dark] transition-colors">
-            <Icon name="Mail" size={14} />
-            hr@company.ru
-          </a>
         </div>
       </section>
 
